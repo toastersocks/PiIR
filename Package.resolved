@@ -1,0 +1,34 @@
+{
+  "object": {
+    "pins": [
+      {
+        "package": "IRSlinger",
+        "repositoryURL": "/home/pi/Projects/IRSlinger",
+        "state": {
+          "branch": "master",
+          "revision": "a20e12edc2277b2f71c5dc1dc3fadd68085790bd",
+          "version": null
+        }
+      },
+      {
+        "package": "SwiftPM",
+        "repositoryURL": "https://github.com/apple/swift-package-manager.git",
+        "state": {
+          "branch": null,
+          "revision": "6983434787dec4e543e9d398a0a9acf63ccd4da1",
+          "version": "0.2.1"
+        }
+      },
+      {
+        "package": "SwiftyGPIO",
+        "repositoryURL": "https://github.com/uraimo/SwiftyGPIO.git",
+        "state": {
+          "branch": "master",
+          "revision": "339390b0632f78511ae9938d623120a7a2c02f1c",
+          "version": null
+        }
+      }
+    ]
+  },
+  "version": 1
+}
