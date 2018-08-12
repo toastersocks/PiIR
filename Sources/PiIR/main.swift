@@ -87,12 +87,11 @@ fileprivate func processCommand(_ command: String?) {
     }
 }
 
-fileprivate func onPipe(filePath: String, callback: ((FileHandle) -> Void)?) { // TODO: take data callback instead of FileHandle
+fileprivate func onPipe(filePath: String, callback: @escaping ((Data) -> Void)) {
     
     let fileManager = FileManager.default
     
     do {
-        
         let pwd = Process(arguments: ["pwd"])
         try pwd.launch()
         let pwdResult = try pwd.waitUntilExit()
@@ -117,7 +116,9 @@ fileprivate func onPipe(filePath: String, callback: ((FileHandle) -> Void)?) { /
         print("\(filePath) exists.")
     }
     
+    var fifo = Fifo(forReadingAtPath: filePath, callback: callback)
     
+    /*
     #if os(Linux)
     guard var commandPipe =
     ReadabilityHandlerFileHandle(forReadingAtPath: filePath) else { fatalError("\"\(filePath)\" pipe does not exist") }
@@ -133,6 +134,7 @@ fileprivate func onPipe(filePath: String, callback: ((FileHandle) -> Void)?) { /
     guard let command = String(data: commandData, encoding: String.Encoding.utf8) else { print("Could not decode data"); return }
     print(command)
     }
+    */
 }
 
 fileprivate func debugReceiver() {
@@ -224,7 +226,6 @@ func processArguments(_ args: [String]) {
         let pipeOption: OptionArgument<String> = argParser.add(option: "--pipe", shortName: "-p", kind: String.self, usage: "Pipes -p <path_of_pipe>", completion: ShellCompletion.filename)
         let debugReceiverOption = argParser.add(option: "--debug", shortName: "-d", kind: Bool.self, usage: "PiIR -d")
         
-//        let args = Array(CommandLine.arguments.dropFirst())
         print("Commandline args: \(args)")
         let parsedArguments = try argParser.parse(args)
         
@@ -238,27 +239,19 @@ func processArguments(_ args: [String]) {
             exit(withExitCode: 0)
         }
         
-        /*
-         if let command = parsedArguments.get(positionalCommand) {
-         print("Loose positional command present: \(command)")
-         processCommand(command)
-         }
-         */
-        
         if let pipeFile = parsedArguments.get(pipeOption) {
             print("Pipe command present: \(pipeFile)")
-            onPipe(filePath: pipeFile) { fileHandle in
+            onPipe(filePath: pipeFile) { commandData in
                 print("Received data")
-                let commandData = fileHandle.readDataToEndOfFile()
                 guard let command = String(data: commandData, encoding: String.Encoding.utf8) else { print("Could not decode data"); return }
                 processCommand(command)
-                while true {}
             }
+            while true {}
         }
         
     } catch ArgumentParserError.expectedValue(let value) {
         print("Missing value for argument \(value).")
-    } catch ArgumentParserError.expectedArguments(let parser, let stringArray) {
+    } catch ArgumentParserError.expectedArguments(_, let stringArray) {
         print("Missing arguments: \(stringArray.joined()).")
     } catch {
         print(error.localizedDescription)
@@ -274,8 +267,9 @@ func exit(withExitCode exitCode: Int32) {
 processArguments(Array(CommandLine.arguments.dropFirst()))
 
 // If no options present
+//import Darwin
 while true {
- processCommand(readLine())
+    processCommand(readLine())
 }
 
 print("Oops too far")

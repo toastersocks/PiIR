@@ -2,15 +2,6 @@
   "object": {
     "pins": [
       {
-        "package": "IRSlinger",
-        "repositoryURL": "/home/pi/Projects/IRSlinger",
-        "state": {
-          "branch": "master",
-          "revision": "a20e12edc2277b2f71c5dc1dc3fadd68085790bd",
-          "version": null
-        }
-      },
-      {
         "package": "SwiftPM",
         "repositoryURL": "https://github.com/apple/swift-package-manager.git",
         "state": {
