@@ -44,7 +44,9 @@ let slinger = NECSlinger()
 
 fileprivate func processCommand(_ command: String?) {
     print("Received command: \(command ?? "nil")")
-    switch command {
+    switch command?
+        .trimmingCharacters(in: .whitespacesAndNewlines)
+        .lowercased() {
     case "q"?, "Q"?:
 //        led.value = 0
         exit(withExitCode: 0)
@@ -83,6 +85,7 @@ fileprivate func processCommand(_ command: String?) {
     // do nothing
     default:
         print("input not recognized")
+        debugPrint(command)
         // do nothing
     }
 }
