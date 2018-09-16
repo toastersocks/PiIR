@@ -44,47 +44,47 @@ let slinger = NECSlinger()
 
 fileprivate func processCommand(_ command: String?) {
     print("Received command: \(command ?? "nil")")
-    switch command?
+    guard let command = command else { print("Received nil from stdin. No stdin present. Exiting..."); exit(withExitCode: EXIT_FAILURE) }
+    switch command
         .trimmingCharacters(in: .whitespacesAndNewlines)
-        .lowercased() {
-    case "q"?, "Q"?:
-//        led.value = 0
-        exit(withExitCode: 0)
-    case "tc"?:
+        .lowercased()
+    {
+    case "q":
+        exit(withExitCode: EXIT_SUCCESS)
+    case "tc":
         print("take me out")
     //        print(testCFunc())
-    case "ts"?:
+    case "ts":
         print("take me out")
 //        print(testSwiftFunc())
-    case "on"?:
+    case "on":
         slinger.send(command: .on)
-    case "off"?:
+    case "off":
         slinger.send(command: .off)
-    case "10"?:
+    case "10":
         slinger.send(command: .ten)
-    case "20"?:
+    case "20":
         slinger.send(command: .twenty)
-    case "30"?:
+    case "30":
         slinger.send(command: .thirty)
-    case "40"?:
+    case "40":
         slinger.send(command: .fourty)
-    case "50"?:
+    case "50":
         slinger.send(command: .fifty)
-    case "60"?:
+    case "60":
         slinger.send(command: .sixty)
-    case "70"?:
+    case "70":
         slinger.send(command: .seventy)
-    case "80"?:
+    case "80":
         slinger.send(command: .eighty)
-    case "90"?:
+    case "90":
         slinger.send(command: .ninety)
-    case "100"?:
+    case "100":
         slinger.send(command: .onehundred)
-    case nil:
-        fallthrough
-    // do nothing
+        
     default:
         print("input not recognized")
+        print("Input was: ")
         debugPrint(command)
         // do nothing
     }
@@ -230,6 +230,9 @@ func processArguments(_ args: [String]) {
         let debugReceiverOption = argParser.add(option: "--debug", shortName: "-d", kind: Bool.self, usage: "PiIR -d")
         
         print("Commandline args: \(args)")
+        if args.isEmpty {
+         readFromStdin()
+        }
         let parsedArguments = try argParser.parse(args)
         
         if parsedArguments.get(debugReceiverOption) == true {
@@ -239,7 +242,7 @@ func processArguments(_ args: [String]) {
         if let command = parsedArguments.get(commandOption) ?? parsedArguments.get(positionalCommand) {
             print("Command option present: \(command)")
             processCommand(command)
-            exit(withExitCode: 0)
+            exit(withExitCode: EXIT_SUCCESS)
         }
         
         if let pipeFile = parsedArguments.get(pipeOption) {
@@ -249,7 +252,7 @@ func processArguments(_ args: [String]) {
                 guard let command = String(data: commandData, encoding: String.Encoding.utf8) else { print("Could not decode data"); return }
                 processCommand(command)
             }
-            while true {}
+//            while true {}
         }
         
     } catch ArgumentParserError.expectedValue(let value) {
@@ -262,18 +265,25 @@ func processArguments(_ args: [String]) {
 
 }
 
-func exit(withExitCode exitCode: Int32) {
+func exit(withExitCode exitCode: Int32) -> Never {
     print("Exiting with exit code \(exitCode)...")
     exit(exitCode)
 }
 
+// If no options present
+func readFromStdin() {
+    while true {
+        processCommand(readLine())
+    }
+}
+
 processArguments(Array(CommandLine.arguments.dropFirst()))
 
-// If no options present
-//import Darwin
 while true {
-    processCommand(readLine())
+    RunLoop.current.run(mode: .defaultRunLoopMode, before: .distantFuture)
 }
+
+
 
 print("Oops too far")
 
