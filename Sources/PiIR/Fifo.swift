@@ -19,7 +19,7 @@ struct Fifo {
         dispatchQueue.async {
             while true {
 //                print("About to open FIFO")
-                guard let pipe = FileHandle(forReadingAtPath: path) else { print("Couldn't open FIFO"); exit(-1) }
+                guard let pipe = FileHandle(forReadingAtPath: path) else { print("Couldn't open FIFO"); exit(EXIT_FAILURE) }
 //                print("FIFO opened.")
             
 //                print("About to read data")
